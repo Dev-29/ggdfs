@@ -13,6 +13,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const ACCESS_TOKEN_HEADER = "X-Access-Token"
+
 func main() {
 	var port string
 	flag.StringVar(&port, "port", "9191", "pass the port number")
@@ -22,6 +24,11 @@ func main() {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:  []string{"http://localhost"},
+		AllowHeaders:  []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, ACCESS_TOKEN_HEADER},
+		ExposeHeaders: []string{echo.HeaderContentLength, echo.HeaderContentDisposition, echo.HeaderContentEncoding},
+	}))
 	router := e.Group("arbokcore")
 	// Routes
 	router.GET("/ping", hello)
